@@ -1,0 +1,6 @@
+mypy==0.761
+requests==2.23.0
+cachetools==4.0.0
+Flask==1.1.1
+pyjwkest==1.4.2
+freezegun==0.3.15
