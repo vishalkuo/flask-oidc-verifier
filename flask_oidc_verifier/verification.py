@@ -1,4 +1,5 @@
-from typing import TypeVar, Callable, Any
+from typing import Any, Callable, TypeVar
+
 from typing_extensions import Protocol
 
 FuncType = Callable[..., Any]  # type: ignore

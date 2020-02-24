@@ -1,6 +1,7 @@
-from flask import Request
 from hmac import compare_digest
 from typing import Type
+
+from flask import Request
 
 
 def get_jwt_value(

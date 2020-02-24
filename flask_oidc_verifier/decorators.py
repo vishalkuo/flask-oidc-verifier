@@ -1,18 +1,19 @@
-from typing import Tuple, cast, Optional, Any, Callable, Union, List
-from flask_oidc_verifier.verification import VerificationProtocol, ReturnT
-from typing_extensions import TypedDict
-import requests
-from cachetools import TTLCache
-from os import path
-from flask import Request, request
-from hmac import compare_digest
-from jwkest.jwk import KEYS
-from jwkest.jws import JWS
-from jwkest import JWKESTException
 import datetime
 from calendar import timegm
-from flask_oidc_verifier.jwt_parser import get_jwt_value
+from hmac import compare_digest
+from os import path
+from typing import Any, Callable, List, Optional, Tuple, Union, cast
 
+import requests
+from cachetools import TTLCache
+from flask import Request, request
+from jwkest import JWKESTException
+from jwkest.jwk import KEYS
+from jwkest.jws import JWS
+from typing_extensions import TypedDict
+
+from flask_oidc_verifier.jwt_parser import get_jwt_value
+from flask_oidc_verifier.verification import ReturnT, VerificationProtocol
 
 OIDCConfig = TypedDict("OIDCConfig", {"jwks_uri": str, "issuer": str})
 OIDCPayload = TypedDict(
