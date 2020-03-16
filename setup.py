@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="flask_oidc_verifier",
-    version="0.0.1",
+    version="0.0.2",
     author="Vishal Kuo",
     author_email="vishalkuo@gmail.com",
     description="Run oidc token verification",
