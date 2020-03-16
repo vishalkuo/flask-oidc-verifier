@@ -68,7 +68,7 @@ class JWTVerification(VerificationProtocol):
         if config is not None:
             return config
         result = requests.get(
-            path.join(self.oidc_endpoint, "/.well-known/openid-configuration")
+            path.join(self.oidc_endpoint, ".well-known/openid-configuration")
         ).json()
         return cast(OIDCConfig, result)
 

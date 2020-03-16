@@ -11,7 +11,7 @@ def get_jwt_value(
     if not auth:
         raise exc("No authorization header provided")
     auth_arr = auth.split(" ")
-    if not compare_digest(auth_arr[0].lower(), auth_header_prefix):
+    if not compare_digest(auth_arr[0].lower(), auth_header_prefix.lower()):
         raise exc("Invalid authorization header.")
 
     if len(auth_arr) == 1:
