@@ -2,7 +2,7 @@ import datetime
 from calendar import timegm
 from hmac import compare_digest
 from os import path
-from typing import Any, Callable, List, Optional, Tuple, Union, cast
+from typing import Any, Callable, List, Optional, Tuple, Union, cast, Dict
 
 import requests
 from cachetools import TTLCache
@@ -12,6 +12,7 @@ from jwkest.jwk import KEYS
 from jwkest.jws import JWS
 from typing_extensions import TypedDict
 
+from flask import Flask
 from flask_oidc_verifier.jwt_parser import get_jwt_value
 from flask_oidc_verifier.verification import ReturnT, VerificationProtocol
 
@@ -27,16 +28,41 @@ class AuthenticationFailed(Exception):
 
 
 class JWTVerification(VerificationProtocol):
+    @classmethod
+    def init_app(  # type: ignore
+        cls,
+        app: Flask,
+        *,
+        on_verified: Optional[Callable[[Dict[str, Any]], None]] = None,
+    ) -> "JWTVerification":
+        app.config.setdefault("OIDC_AUTH_HEADER_PREFIX", "Bearer")
+        app.config.setdefault("OIDC_AUTH_HEADER", "Authorization")
+        app.config.setdefault("OIDC_CACHE_TIMEOUT_S", 60 * 10)
+        app.config.setdefault("OIDC_VERIFY_IAT", True)
+        app.config.setdefault("OIDC_LEEWAY", 60 * 10)
+
+        return cls(
+            oidc_leeway=app.config["OIDC_LEEWAY"],
+            oidc_endpoint=app.config["OIDC_ENDPOINT"],
+            oidc_audiences=app.config["OIDC_AUDIENCES"],
+            oidc_cache_timeout_s=app.config["OIDC_CACHE_TIMEOUT_S"],
+            auth_header_prefix=app.config["OIDC_AUTH_HEADER_PREFIX"],
+            authorization_header=app.config["OIDC_AUTH_HEADER"],
+            verify_iat=app.config["OIDC_VERIFY_IAT"],
+            on_verified=on_verified,
+        )
+
     def __init__(  # type: ignore
         self,
+        *,
         oidc_leeway: int,
         oidc_endpoint: str,
         oidc_audiences: Tuple[str],
-        on_verified: Optional[Callable[[Any], None]] = None,
         oidc_cache_timeout_s: int = 60 * 10,
         auth_header_prefix: str = "Bearer",
         authorization_header: str = "Authorization",
         verify_iat: bool = True,
+        on_verified: Optional[Callable[[Any], None]] = None,
     ) -> None:
         self.oidc_leeway = oidc_leeway
         self.oidc_endpoint = oidc_endpoint

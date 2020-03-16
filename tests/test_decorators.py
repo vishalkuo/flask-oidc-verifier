@@ -15,7 +15,11 @@ def test_validate_claims_invalid_issuer(monkeypatch: Any) -> None:
         return MockResponse(OIDCConfig)
 
     monkeypatch.setattr(requests, "get", mock_get)
-    verification = JWTVerification(100, "http://dummy/endpoint.com", ("test",))
+    verification = JWTVerification(
+        oidc_leeway=100,
+        oidc_endpoint="http://dummy/endpoint.com",
+        oidc_audiences=("test",),
+    )
     with pytest.raises(AuthenticationFailed):
         verification.validate_claims(
             {"iss": "foo", "aud": "bar", "exp": 1, "nbf": 2, "iat": 0}
@@ -28,7 +32,11 @@ def test_validate_claims_invalid_aud(monkeypatch: Any) -> None:
 
     audience = "some_aud"
     monkeypatch.setattr(requests, "get", mock_get)
-    verification = JWTVerification(100, "http://dummy/endpoint.com", (audience,))
+    verification = JWTVerification(
+        oidc_leeway=100,
+        oidc_endpoint="http://dummy/endpoint.com",
+        oidc_audiences=(audience,),
+    )
     with pytest.raises(AuthenticationFailed):
         verification.validate_claims(
             {"iss": OIDCConfig["issuer"], "aud": "foo", "exp": 1, "nbf": 2, "iat": 0}
@@ -41,7 +49,11 @@ def test_validate_claims_token_already_exp(monkeypatch: Any) -> None:
 
     audience = "some_aud"
     monkeypatch.setattr(requests, "get", mock_get)
-    verification = JWTVerification(100, "http://dummy/endpoint.com", (audience,))
+    verification = JWTVerification(
+        oidc_leeway=100,
+        oidc_endpoint="http://dummy/endpoint.com",
+        oidc_audiences=(audience,),
+    )
     with pytest.raises(AuthenticationFailed), freeze_time(datetime(2020, 1, 1)):
         verification.validate_claims(
             {"iss": OIDCConfig["issuer"], "aud": audience, "exp": 1, "nbf": 2, "iat": 0}
@@ -55,7 +67,10 @@ def test_validate_claims_token_iat(monkeypatch: Any) -> None:
     audience = "some_aud"
     monkeypatch.setattr(requests, "get", mock_get)
     verification = JWTVerification(
-        0, "http://dummy/endpoint.com", (audience,), verify_iat=True
+        oidc_leeway=100,
+        oidc_endpoint="http://dummy/endpoint.com",
+        oidc_audiences=(audience,),
+        verify_iat=True,
     )
     t = datetime(2020, 1, 1)
     with pytest.raises(AuthenticationFailed), freeze_time(t):
@@ -76,7 +91,11 @@ def test_validate_claims_token_nbf(monkeypatch: Any) -> None:
 
     audience = "some_aud"
     monkeypatch.setattr(requests, "get", mock_get)
-    verification = JWTVerification(100, "http://dummy/endpoint.com", (audience,))
+    verification = JWTVerification(
+        oidc_leeway=100,
+        oidc_endpoint="http://dummy/endpoint.com",
+        oidc_audiences=(audience,),
+    )
     t = datetime(2020, 1, 1)
     with pytest.raises(AuthenticationFailed), freeze_time(t):
         verification.validate_claims(
@@ -96,7 +115,11 @@ def test_validate_claims_token(monkeypatch: Any) -> None:
 
     audience = "some_aud"
     monkeypatch.setattr(requests, "get", mock_get)
-    verification = JWTVerification(100, "http://dummy/endpoint.com", (audience,))
+    verification = JWTVerification(
+        oidc_leeway=100,
+        oidc_endpoint="http://dummy/endpoint.com",
+        oidc_audiences=(audience,),
+    )
     t = datetime(2020, 1, 1)
     with freeze_time(t):
         verification.validate_claims(
