@@ -96,6 +96,7 @@ class JWTVerification(VerificationProtocol):
         result = requests.get(
             path.join(self.oidc_endpoint, ".well-known/openid-configuration")
         ).json()
+        self.config_cache["flask-oidc-config"] = result
         return cast(OIDCConfig, result)
 
     def authenticate(self, r: Request) -> OIDCPayload:
@@ -133,6 +134,7 @@ class JWTVerification(VerificationProtocol):
             return result
         r = requests.get(self.oidc_config["jwks_uri"], allow_redirects=True)
         r.raise_for_status()
+        self.config_cache["flask-oidc-jwks-data"] = r.text
         return r.text
 
     def validate_claims(self, id_token: OIDCPayload) -> None:
