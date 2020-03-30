@@ -1,6 +1,6 @@
 from flask_oidc_verifier.decorators import JWTVerification, AuthenticationFailed
 from tests.mocks import MockResponse
-from typing import Any
+from typing import Any, Callable
 import requests
 import pytest
 from freezegun import freeze_time
@@ -159,8 +159,12 @@ def test_validate_claims_token(monkeypatch: Any, default_cache: Cache) -> None:
     assert call_count == 1
 
 
-def test_cache_with_redis(monkeypatch: Any, redis_cache: Cache) -> None:
+def test_cache_with_redis(
+    monkeypatch: Any, redis_cache: Cache, reset_redis: Callable[[], None]
+) -> None:
     call_count = 0
+
+    reset_redis()
 
     def mock_get(args: Any, **kwargs: Any) -> MockResponse:
         nonlocal call_count
