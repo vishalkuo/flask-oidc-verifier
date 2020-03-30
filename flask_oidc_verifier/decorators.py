@@ -15,6 +15,7 @@ from typing_extensions import TypedDict
 from flask import Flask
 from flask_oidc_verifier.jwt_parser import get_jwt_value
 from flask_oidc_verifier.verification import ReturnT, VerificationProtocol
+from flask_oidc_verifier.caches import Cache
 
 OIDCConfig = TypedDict("OIDCConfig", {"jwks_uri": str, "issuer": str})
 OIDCPayload = TypedDict(
@@ -34,22 +35,25 @@ class JWTVerification(VerificationProtocol):
         app: Flask,
         *,
         on_verified: Optional[Callable[[Dict[str, Any]], None]] = None,
+        cache: Optional[Cache] = None,
     ) -> "JWTVerification":
         app.config.setdefault("OIDC_AUTH_HEADER_PREFIX", "Bearer")
         app.config.setdefault("OIDC_AUTH_HEADER", "Authorization")
         app.config.setdefault("OIDC_CACHE_TIMEOUT_S", 60 * 10)
         app.config.setdefault("OIDC_VERIFY_IAT", True)
         app.config.setdefault("OIDC_LEEWAY", 60 * 10)
+        if cache is None:
+            cache = TTLCache(maxsize=10, ttl=app.config["OIDC_CACHE_TIMEOUT_S"])
 
         return cls(
             oidc_leeway=app.config["OIDC_LEEWAY"],
             oidc_endpoint=app.config["OIDC_ENDPOINT"],
             oidc_audiences=app.config["OIDC_AUDIENCES"],
-            oidc_cache_timeout_s=app.config["OIDC_CACHE_TIMEOUT_S"],
             auth_header_prefix=app.config["OIDC_AUTH_HEADER_PREFIX"],
             authorization_header=app.config["OIDC_AUTH_HEADER"],
             verify_iat=app.config["OIDC_VERIFY_IAT"],
             on_verified=on_verified,
+            cache=cache,
         )
 
     def __init__(  # type: ignore
@@ -58,7 +62,7 @@ class JWTVerification(VerificationProtocol):
         oidc_leeway: int,
         oidc_endpoint: str,
         oidc_audiences: Tuple[str],
-        oidc_cache_timeout_s: int = 60 * 10,
+        cache: Cache,
         auth_header_prefix: str = "Bearer",
         authorization_header: str = "Authorization",
         verify_iat: bool = True,
@@ -68,7 +72,7 @@ class JWTVerification(VerificationProtocol):
         self.oidc_endpoint = oidc_endpoint
         self.oidc_audiences = oidc_audiences
         self.on_verified = on_verified
-        self.config_cache = TTLCache(maxsize=10, ttl=oidc_cache_timeout_s)
+        self.config_cache = cache
         self.auth_header_prefix = auth_header_prefix
         self.authorization_header = authorization_header
         self.verify_iat = verify_iat

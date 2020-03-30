@@ -4,3 +4,4 @@ cachetools==4.0.0
 Flask==1.1.1
 pyjwkest==1.4.2
 freezegun==0.3.15
+redis==3.4.1

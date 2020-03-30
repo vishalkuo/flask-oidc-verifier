@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  redis:
+    container_name: flask_oidc_verifier_cache
+    image: redis:5.0
+    ports:
+      - "6379:6379"
