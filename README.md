@@ -1,5 +1,7 @@
 # Flask OIDC Verifier
 
+[![PyPI version](https://badge.fury.io/py/flask-oidc-verifier.svg)](https://badge.fury.io/py/flask-oidc-verifier)
+
 Implements implicit OIDC verification for Flask, similar to [drf-oidc-auth](https://github.com/ByteInternet/drf-oidc-auth) in Django.
 
 ## Quickstart
