@@ -19,10 +19,14 @@ class RedisCache:
         password: t.Optional[str] = None,
         db: int = 0,
         ttl_s: int = 60 * 10,
+        conn_url: t.Optional[str] = None,
     ) -> None:
         import redis
 
-        self.client = redis.Redis(host=host, port=port, password=password, db=db)
+        if conn_url is not None:
+            self.client = redis.Redis.from_url(conn_url, db=db)
+        else:
+            self.client = redis.Redis(host=host, port=port, password=password, db=db)
         self.ttl_s = ttl_s
 
     def get(self, key: str, default: t.Optional[t.Any] = None) -> t.Any:  # type: ignore

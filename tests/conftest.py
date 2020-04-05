@@ -11,7 +11,7 @@ def default_cache() -> TTLCache:  # type: ignore
 
 @pytest.fixture  # type: ignore
 def redis_cache() -> RedisCache:
-    return RedisCache(host="localhost", port=6379)
+    return RedisCache(conn_url="redis://localhost:6379/0")
 
 
 @pytest.fixture  # type: ignore
