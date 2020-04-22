@@ -10,7 +10,7 @@ from flask import Request, request
 from jwkest import JWKESTException
 from jwkest.jwk import KEYS
 from jwkest.jws import JWS
-from typing_extensions import TypedDict
+from typing import TypedDict
 
 from flask import Flask
 from flask_oidc_verifier.jwt_parser import get_jwt_value

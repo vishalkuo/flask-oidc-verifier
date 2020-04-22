@@ -1,6 +1,6 @@
 from typing import Any, Callable, TypeVar
 
-from typing_extensions import Protocol
+from typing import Protocol
 
 FuncType = Callable[..., Any]  # type: ignore
 ReturnT = TypeVar("ReturnT", bound=FuncType)

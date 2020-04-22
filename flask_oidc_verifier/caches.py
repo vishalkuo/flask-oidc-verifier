@@ -1,6 +1,6 @@
 import typing as t
 import pickle
-from typing_extensions import Protocol
+from typing import Protocol
 
 
 class Cache(Protocol):
