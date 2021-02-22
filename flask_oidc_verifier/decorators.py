@@ -97,9 +97,11 @@ class JWTVerification(VerificationProtocol):
         )
         if config is not None:
             return config
-        result = requests.get(
+        r = requests.get(
             path.join(self.oidc_endpoint, ".well-known/openid-configuration")
-        ).json()
+        )
+        r.raise_for_status()
+        result = r.json()
         self.config_cache["flask-oidc-config"] = result
         return cast(OIDCConfig, result)
 

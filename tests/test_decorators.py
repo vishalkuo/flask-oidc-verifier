@@ -203,3 +203,29 @@ def test_cache_with_redis(
         )
 
     assert call_count == 1
+
+def test_raises_exc_on_config_failure(monkeypatch: Any, default_cache: Cache) -> None:
+    class DummyExc(Exception):
+        ...
+    def mock_get(*args: Any, **kwargs: Any) -> MockResponse:
+        return MockResponse({}, DummyExc)
+
+    audience = "some_aud"
+    monkeypatch.setattr(requests, "get", mock_get)
+    verification = JWTVerification(
+        oidc_leeway=100,
+        oidc_endpoint="http://dummy/endpoint.com",
+        oidc_audiences=(audience,),
+        cache=default_cache,
+    )
+    t = datetime(2020, 1, 1)
+    with pytest.raises(DummyExc), freeze_time(t):
+        verification.validate_claims(
+            {
+                "iss": OIDCConfig["issuer"],
+                "aud": audience,
+                "exp": int(t.strftime("%s")),
+                "nbf": int(datetime(2020, 2, 2).strftime("%s")),
+                "iat": 0,
+            }
+        )
